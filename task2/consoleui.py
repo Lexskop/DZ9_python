@@ -1,26 +1,23 @@
-def view_data(data, title):
-    print(f'{title} = {data}')
+from telegram.ext import Updater, CallbackContext, Filters, MessageHandler
+from telegram import Update
+from config import TOKEN
 
+def view_data(data, title, update: Update, context: CallbackContext):
+    update.message.reply_text(f'{title} = {data}')
 
-def get_value():
-    return input()
+def input_data(update: Update, context: CallbackContext):
+    update.message.reply_text('Через пробел: 1 - компл., 2 - рац.числа; первое число; второе число; операция')
+    message = update.message.text.split(' ')
+    data_type = message[0]
+    left_value = message[1]
+    right_value = message[2]
+    oper = message[3]
+    return data_type, left_value, right_value, oper
 
-
-def input_data():
-    print('С какими числами будем работать? Введите 1 для работы с комплексными числами, 2 - для работы с рациональными числами')
-    data_type = get_value()
-    if data_type == '1':
-        print('Введите первое число (используйте формат: "5 + 3j"):')
-        left_value = get_value()
-        print('Введите второе число (используйте формат: "5 + 3j"):')
-        right_value = get_value()
-        print('Выберите операцию:')
-        oper = get_value()
-    elif data_type == '2':
-        print('Введите первое число (используйте формат: "5/11"):')
-        left_value = get_value()
-        print('Введите второе число (используйте формат: "5/11"):')
-        right_value = get_value()
-        print('Выберите операцию:')
-        oper = get_value()
-    return (data_type, left_value, oper, right_value)
+updater = Updater(TOKEN)
+dispetcher = updater.dispatcher
+message_handler = MessageHandler(Filters.text, input_data)
+dispetcher.add_handler(message_handler)
+print('Cервер запущен')
+updater.start_polling()
+updater.idle()
